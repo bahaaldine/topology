@@ -9,7 +9,8 @@ export default function (kibana) {
       app: {
         title: 'topology',
         description: 'a cluster Topology explorer',
-        main: 'plugins/topology/app'
+        main: 'plugins/topology/app',
+        icon: 'plugins/topology/topology.png',
       },
       
       hacks: [

@@ -1,5 +1,17 @@
 import _ from 'lodash';
 
+const healthColors = {
+	index: {
+		green: '#4CAF50',
+		yellow: '#F9A825',
+		red: '#F44336'
+	},
+	shard: {
+		started: '#03A9F4',
+		unassigned: '#9E9E9E'
+	}
+}
+
 function catIndices(server) {
 	const client = server.plugins.elasticsearch.client;
 	return function() {
@@ -32,71 +44,79 @@ function toMB(value) {
 }
 
 function buildChartData(topology = {}) {
-	return _.map(topology.indices, (indexItem, indexName) => {
-		return {
-			value: toMB(indexItem['store.size']),
-			name: indexName,
-			path: indexName,
-			children: _.map(indexItem.shards, (shardTypeItem, shardType) => {
-				const shardTypeName = shardType == 'p' ? 'primary' : 'replica'; 
-				return {
-					value: Object.keys(shardTypeItem).length,
-					name: shardTypeName ,
-					path: indexName + "/" + shardTypeName,
-					children: _.map(shardTypeItem, (shardItem, shardName) => {
-						return {
-							value: shardItem.store == null ? 0 : toMB(shardItem.store),
-							name: shardName,
-							path: indexName + "/" + shardTypeName + "/" + shardName,
-							children: _.map(shardItem.segments, (segmentItem, segmentName) => {
-								return {
-									value: toMB(segmentItem['size']),
-									name: segmentName,
-									path: indexName + "/" + shardTypeName + "/" + shardName + "/" + segmentName
-								}
-							})
-						}
-					})
-				} 
-			})
-		}
-	});
+	return {
+		cluster: topology.health,
+		treemap: _.map(topology.indices, (indexItem, indexName) => {
+			return {
+				...indexItem,
+				value: toMB(indexItem['store.size']),
+				name: indexName,
+				path: indexName,
+				color: healthColors.index[indexItem.health],
+				children: _.map(indexItem.shards, (shardItem, shardName) => {
+					return {
+						...shardItem,
+						value: shardItem.store == null ? 0 : toMB(shardItem.store),
+						name: shardName,
+						path: indexName + '/' + shardName,
+						color: healthColors.shard[shardItem.state.toLowerCase()],
+						children: _.map(shardItem.segments, (segmentItem, segmentName) => {
+							return {
+								...segmentItem,
+								value: toMB(segmentItem['size']),
+								name: segmentName,
+								path: indexName + '/' + shardName+ '/' + segmentName
+							}
+						})
+					}
+				})
+			}
+		})
+	}
 }
 
 function getClusterTopology(server) {
 	const client = server.plugins.elasticsearch.client;
-	var topology = { indices : {} };
+	let topology = { health: {}, indices : {} };
 	return function() {
-		return client.cat.indices({format: 'json'}).then(function(catIndicesResponse) {
-			// adding each index to the topology
-			catIndicesResponse.map(index => {
-				topology.indices[index.index] = { ...index };
-				topology.indices[index.index].shards = { p:{} , r:{} };
-			});			
-			
-			// preparing a comma separated string of index name for shards and segments api
-			const indexNames = catIndicesResponse.map(index => {
-				return index.index;
-			}).join(',');
+		function getShardTypeName(shardType) {
+			return shardType == 'p' ? 'primary' : 'replica'; 
+		}
 
-			return client.cat.shards({format: 'json', index: indexNames}).then(function(catShardsResponse) {
-				// adding each shard to the relative index topology document
-				catShardsResponse.map(shard => {
-					topology.indices[shard.index].shards[shard.prirep][shard.shard] = { ...shard };
-					topology.indices[shard.index].shards[shard.prirep][shard.shard].segments = {};
-				});
+		return client.cat.health({format: 'json'}).then( (catHealthResponse) => {
+			topology.health = catHealthResponse[0];
 
-				return client.cat.segments({format: 'json', index: indexNames}).then(function(catSegmentsResponse) {
-					
-					// adding each segment to the relative shards
-					catSegmentsResponse.map(segment => {
-						// segments exist only for assigned shards
-						if ( typeof topology.indices[segment.index].shards[segment.prirep][segment.shard] != "undefined" ) {
-							topology.indices[segment.index].shards[segment.prirep][segment.shard].segments[segment.segment] = { ...segment };
-						}
+			return client.cat.indices({format: 'json'}).then( (catIndicesResponse) => {
+				// adding each index to the topology
+				catIndicesResponse.map(index => {
+					topology.indices[index.index] = { ...index };
+					topology.indices[index.index].shards = { };
+				});			
+				
+				// preparing a comma separated string of index name for shards and segments api
+				const indexNames = catIndicesResponse.map(index => {
+					return index.index;
+				}).join(',');
+
+				return client.cat.shards({format: 'json', index: indexNames}).then( (catShardsResponse) => {
+					// adding each shard to the relative index topology document
+					catShardsResponse.map(shard => {
+						topology.indices[shard.index].shards[getShardTypeName(shard.prirep) + '-' + shard.shard] = { ...shard };
+						topology.indices[shard.index].shards[getShardTypeName(shard.prirep) + '-' + shard.shard].segments = {};
 					});
 
-					return topology;
+					return client.cat.segments({format: 'json', index: indexNames}).then( (catSegmentsResponse) => {
+						
+						// adding each segment to the relative shards
+						catSegmentsResponse.map(segment => {
+							// segments exist only for assigned shards
+							if ( typeof topology.indices[segment.index].shards[getShardTypeName(segment.prirep) + '-' + segment.shard] != "undefined" ) {
+								topology.indices[segment.index].shards[getShardTypeName(segment.prirep) + '-' + segment.shard].segments['segment-' + segment.segment] = { ...segment };
+							}
+						});
+
+						return topology;
+					});
 				});
 			});
 		});

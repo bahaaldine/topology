@@ -1,4 +1,5 @@
 import uiModules from 'ui/modules';
+import _ from 'lodash';
 import echarts from 'plugins/topology/../node_modules/echarts/dist/echarts.min.js';
 
 uiModules
@@ -6,7 +7,7 @@ uiModules
 .controller('indexController', [ '$scope', 'Topology', function ($scope, Topology) {
     
 }])
-.directive('clusterTopology', [ 'Topology', '$window', function (Topology, $window) {
+.directive('clusterTopology', [ 'Topology', '$window', '$timeout', function (Topology, $window, $timeout) {
 	return {
     link: function($scope, $element, attrs) {
     	const myChart = echarts.init($element[0]);
@@ -15,17 +16,15 @@ uiModules
 
 			$scope.topology = new Topology();
 			$scope.topology.getClusterTopology().then( response => {
+				$scope.topology.setClusterName(response.data.cluster.cluster);
 				myChart.hideLoading();
 
 				myChart.setOption({
-	        title: {
-            text: 'Cluster Topology',
-            subtext: 'Cluster name',
-            left: 'center'
-	        },
 	        tooltip: {
             formatter: function (info) {
               const value = info.value;
+              const docsCount = info.data['docs.count'];
+              const docsDeleted = info.data['docs.deleted'];
               const treePathInfo = info.treePathInfo;
               const treePath = [];
 
@@ -43,68 +42,91 @@ uiModules
               	return formatUtil.addCommas(value) + ' MB';
               }
 
+              let docsStats = ['<div>Docs count: ' + formatUtil.addCommas(docsCount) + '</div>',
+                '<div>Docs deleted: ' + formatUtil.addCommas(docsDeleted) + '</div>'];
+              if ( typeof info.data.segments != 'undefined' ) {
+              	docsStats = ['<div>Docs count: ' + formatUtil.addCommas(info.data['docs']) + '</div>']
+              }	
+
               return [
                   '<div class="tooltip-title">' + formatUtil.encodeHTML(treePath.join('/')) + '</div>',
-                  'Disk Usage: ' + scaleValue(value),
-              ].join('');
+                  '<div>Disk Usage: ' + scaleValue(value)+ '</div>'
+              ].concat(docsStats).join('');
           	}
 	        },
 	        series: [{
-            name: 'Topology',
+            name: 'Index topology',
             type: 'treemap',
-            data: response.data,
+            data: response.data.treemap,
+            visibleMin: null,
             leafDepth: 1,
+            zoomToNodeRatio: 0.02*0.02,
+            breadcrumb: {
+            	top: 1,
+              itemStyle: {
+                normal: {
+                  color: '#607D8B',
+                  borderWidth: 1,
+                  borderColor: '#90A4AE',
+                  textStyle: {
+                    fontSize: 14
+                  }
+                }
+              }
+            },
             levels: [
               {
-              	color: ['#2196F3','#3F51B5','#E91E63','#9C27B0','#009688','#673AB7','#F44336','#03A9F4','#00BCD4','#4CAF50','#FF9800'],
+              	color: $scope.topology.getIndicesColors(response.data.treemap),
                 itemStyle: {
                   normal: {
-                    borderColor: '#E1F5FE',
-                    borderWidth: 2,
-                    gapWidth: 2
+                    borderColor: '#2f99c1',
+                    borderWidth: 15,
+                    gapWidth: 15
                   }
                 }
               },
               {
-                colorSaturation: [0.1, 0.9],
+              	color: $scope.topology.getShardsColors(response.data.treemap),
+
                 itemStyle: {
                   normal: {
-                    borderColorSaturation: 0.7,
-                    gapWidth: 1,
-                    borderWidth: 1
+                  	borderColor: '#424242',
+                    borderWidth: 10,
+                    gapWidth: 10
                   }
                 }
               },
               {
-                colorSaturation: [0.3, 0.5],
+
                 itemStyle: {
                   normal: {
-                    borderColorSaturation: 0.6,
-                    gapWidth: 1
+                  	borderColor: '#212121',
+                    borderWidth: 10,
+                    gapWidth: 10
                   }
                 }
-              },
-              {
-                colorSaturation: [0.3, 0.5]
               }
             ]
 	        }]
 		    });
 		  });
 
-			angular.element($window).bind('resize', function(){
+			const resizeChart = function() {
 				if(myChart != null && typeof myChart != 'undefined') {
           myChart.resize({ 
           	width: angular.element('.topology-container')[0].offsetWidth, 
-          	height: angular.element('.topology-container')[0].offsetHeight
+          	height: angular.element('.topology-container')[0].offsetHeight - 100
           });
         }
 
 				// manuall $digest required as resize event
 				// is outside of angular
 				$scope.$digest();
-     	});
+     	}
+
+			angular.element($window).bind('resize', resizeChart);
 	
+			$timeout( function() { resizeChart(); } );
     }
   }
 }]);

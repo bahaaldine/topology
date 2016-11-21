@@ -19,7 +19,7 @@ var packageName = pkg.name  + '-' + pkg.version;
 var buildDir = path.resolve(__dirname, 'build');
 var targetDir = path.resolve(__dirname, 'target');
 var buildTarget = path.resolve(buildDir, 'kibana/' + pkg.name);
-var kibanaPluginDir = path.resolve(__dirname, '/Users/bahaaldine/Dropbox/elastic/plugins/kibana/kibana5.0.0/plugins/' + pkg.name);
+var kibanaPluginDir = path.resolve(__dirname, '../kibana5.0.0/plugins/' + pkg.name);
 
 var include = [
   'package.json',
