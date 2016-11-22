@@ -1,0 +1,24 @@
+language: node_js
+node_js:
+- 6.9.0
+
+script:
+- gulp build
+- gulp package
+
+deploy:
+  provider: releases
+  api_key:
+    secure: HWPK1BBoCb0gsMwVNmuA7+LB7Yhm2bBSt7wZW402bsOC89B1Fq6ODTGLBxH/jTRDl9Qol7w4/jfKFiJbS7PDVC5bSBauKm0YKXniSQM4Fae8EC6FK/LG/0bztojz+uzNP4zZ80mUXS127GFGbjMTRkkvd5Ise7mCvTbpECJOBDSEX6rIFuBMQyy3WFzXos/3uuCtQEtTw5SnY8X9r8NKq8QmAZ4SrmHqDnCXLW/j372xjVcPYxRNRLxf7z6lznRR/4vyENXCOypdtyUdCcXjFvm8MbRR0YmUb8Y7PimyszytMeX+yR4Hf0IV64Vmj6PU5VQFwmYKWVCjL2FLZITxcq5JzDuyodthK4vBKceF0qGFIdt/GskNhpmduPke2nsqEE7cq1/+k4l05HmLdu8n2yvpYdssZ7YZP90W5sOo4uaDGoDiFvcsOc8pA7y3PlcpHfMQV+yPQOHE1FyrWhjDPQax10clCjF8bzLeTEjAMDOUaJpcLOjqtiZpkT2QbFDPDpYsVf0a0f7q48euAqsa0FpHUA4N1pglPd9RsHT0j30UWmMoKoZi/nnRyIvTU5TfPe1thhZ7NZnMI7jCYQeVYKRIUxba3zey0WvDGBWl17sHyUCt6LWwi99MKvvL/7qjeLi9DxqRCVnLzudIUvK0dyP9A8PSjbKlhiM1Y0mmxEc=
+  file: $TRAVIS_BUILD_DIR/target/topology-*.zip
+  skip_cleanup: true
+  on:
+    repo: bahaaldine/topology
+    tags: true
+    node: 6.9.0
+after_success:
+- |2-
+
+  $(npm bin)/set-up-ssh --key "$encrypted_XXXXXXXXXXXX_key" \
+                        --iv "$encrypted_XXXXXXXXXXXX_iv" \
+                        --path-encrypted-key ".travis/github_deploy_key.enc"
