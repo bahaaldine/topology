@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-- 4
+- 6.9.0
 
 sudo: required
 dist: trusty
@@ -18,7 +18,7 @@ deploy:
   on:
     repo: bahaaldine/topology
     tags: true
-    node: 4
+    node: 6.9.0
 after_success:
 - |2-
 
