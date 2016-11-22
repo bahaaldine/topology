@@ -15,6 +15,7 @@
     "postinstall": "plugin-helpers postinstall"
   },
   "devDependencies": {
+    "@alrra/travis-scripts": "^3.0.1",
     "@elastic/eslint-config-kibana": "0.0.2",
     "@elastic/plugin-helpers": "5.0.1-pre3",
     "babel-eslint": "4.1.8",
