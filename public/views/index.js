@@ -5,7 +5,7 @@ import echarts from 'plugins/topology/../node_modules/echarts/dist/echarts.min.j
 uiModules
 .get('app/topology', [])
 .controller('indexController', [ '$scope', 'Topology', function ($scope, Topology) {
-    
+
 }])
 .directive('clusterTopology', [ 'Topology', '$window', '$timeout', function (Topology, $window, $timeout) {
 	return {
