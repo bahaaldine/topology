@@ -12,7 +12,6 @@ var gzip = require('gulp-gzip');
 var zip = require('gulp-zip');
 var fs = require('fs');
 var lab = require('gulp-lab');
-
 var pkg = require('./package.json');
 var packageName = pkg.name  + '-' + pkg.version;
 
