@@ -9,13 +9,27 @@ script:
 - gulp build
 - gulp package
 
+before_install:
+  - openssl aes-256-cbc -K $encrypted_5f819ac0d0f8_key -iv $encrypted_5f819ac0d0f8_iv -in github_deploy_key.enc -out github_deploy_key -d
+
+env:
+  global:
+    - secure: "fLcBuV72stc6XRexM9uziwwoql9IIeWwSSzs84/PRwKlM7NrQ+wcsBJ+fR8FN4d9uWlHHkb9sw/rpA5KK0u5COd5HVRx56S+mN2DZO1ihZIElJBARAgLzPrNJ69Nm+z4EET+fCwyDwzAwFjrSetF9+QOwmyUO8vllGoM3TZMEhtZU+9OnehErGTYqk0FU6dkXuIv7zoXCzqukMFIK0txq6TdCSOooodRNkdqkHUlPE/8BSnG/RRD2l9qpR2n/rvnVmTpgCLrfxsclb0WfzpHNIZvi45en4GM2a+wRxfM4/F+bap8zufWN4dqp8gWBzIVDsboNqEeLcI6EgxY7gJadPZi44LHBzAfDaSkH6OVpgmLvUuqyC2GCaTGy4mDj/nubT404pjlP+VB6q1gqeBQfoyVl71O8sFwa4wVeqdK6qpJh+rEyhzUWAuR9COuapcq7OIEvCRo3X+8alFxH2dsi5ovFDPMwK09RT/WhnR5Zl2UJtwRDWHd7rl3RnN+C1kQ0E5gkXKwQtx5GrO+aLxR7DY1QO0IJZssjlD4tdGRUswXL3N5t8idCEulqOh2DN5SGxg0lYIAsgTP/sbtYdFVc3Ds+pO8/o0zpEb4TjlKA62Go0VKiCkcuqH25Cs/moo/853dgb6DCC7WBol+p6+UgW+c/EL4uZMa/ESmlsIdLGg="
+
 deploy:
   provider: releases
   api_key:
-    secure: gdCQfwnEFacIZcAYef3ZYE0CbLgDW4eDi7D1yu/6g3mRmEarHg6XmGIJASk5Qi5qeMbx9oRAq2alkbNs6RT0G5JSeOG+qF4bBfcNt0vCjWraRNyr0y9c0rjg+oAnYweQyst1L27w2MZLZxvV6sHUFtx2sHDu5sOkAVgZ7RkRaDJElBf4ShxUlOWLYhygGQaRvi868Rr5nJdJn51fKqsJBJODyV/eSo9uGyeP+ix+j9KInDME7dpFtiGNDhxgxm51/sDT4IlyFl67F31snA7fcCxvNwpHbeSqrTQdgVFq7NTiq/W5Ig8LQwqzV0WaxyXbur79UVQk6HJ/SG08m1kH0ehZXAsDy3+exoIVJYPOLCp5E3J+HfClApI8ONZ7sXi5Er0vwz+Nm8Oen9nT5GxjmqZMKxV+u6m29SWbPNR0kKUVSX5jpPzmQnQ0qv9Y7ymebK3nj298mGebdELR5SFK5XrSq7jEKzcl4sEynaCRI98H2l4sPpozmu0crPaUTIzmjtkE6Wxn5e9K3uXTSrYzVlNnGcMXJrKo9K9Zv52NITZKZxBJxy2poxMEeLWCgbec+XQImnx52adR6zHrcuPFReMRh7KJ2Bk+ArTapYTop+64hfAKT77iw91+zylag0aBPNnF7/PN+0SFUgiXHLucgE8cwxnNlNFLIRAVu5gbJ9I=
+    secure: fLcBuV72stc6XRexM9uziwwoql9IIeWwSSzs84/PRwKlM7NrQ+wcsBJ+fR8FN4d9uWlHHkb9sw/rpA5KK0u5COd5HVRx56S+mN2DZO1ihZIElJBARAgLzPrNJ69Nm+z4EET+fCwyDwzAwFjrSetF9+QOwmyUO8vllGoM3TZMEhtZU+9OnehErGTYqk0FU6dkXuIv7zoXCzqukMFIK0txq6TdCSOooodRNkdqkHUlPE/8BSnG/RRD2l9qpR2n/rvnVmTpgCLrfxsclb0WfzpHNIZvi45en4GM2a+wRxfM4/F+bap8zufWN4dqp8gWBzIVDsboNqEeLcI6EgxY7gJadPZi44LHBzAfDaSkH6OVpgmLvUuqyC2GCaTGy4mDj/nubT404pjlP+VB6q1gqeBQfoyVl71O8sFwa4wVeqdK6qpJh+rEyhzUWAuR9COuapcq7OIEvCRo3X+8alFxH2dsi5ovFDPMwK09RT/WhnR5Zl2UJtwRDWHd7rl3RnN+C1kQ0E5gkXKwQtx5GrO+aLxR7DY1QO0IJZssjlD4tdGRUswXL3N5t8idCEulqOh2DN5SGxg0lYIAsgTP/sbtYdFVc3Ds+pO8/o0zpEb4TjlKA62Go0VKiCkcuqH25Cs/moo/853dgb6DCC7WBol+p6+UgW+c/EL4uZMa/ESmlsIdLGg=
   file: $TRAVIS_BUILD_DIR/target/topology-*.zip
   skip_cleanup: true
   on:
     repo: bahaaldine/topology
     tags: true
     node: 6.9.0
+
+after_success:
+- |2-
+
+  $(npm bin)/set-up-ssh --key "$encrypted_XXXXXXXXXXXX_key" \
+                        --iv "$encrypted_XXXXXXXXXXXX_iv" \
+                        --path-encrypted-key ".travis/github_deploy_key.enc"
