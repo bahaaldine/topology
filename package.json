@@ -1,6 +1,6 @@
 {
   "name": "topology",
-  "version": "0.0.0",
+  "version": "5.0.0",
   "description": "a cluster Topology explorer",
   "main": "index.js",
   "kibana": {

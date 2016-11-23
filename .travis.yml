@@ -16,7 +16,7 @@ deploy:
   provider: releases
   api_key:
     secure: tGKykjJbFRv4hZClpsqBKkTv8VazV8DrWTKbJyqIN4LFMYrUjfkrb6DpO8t0sO+UHHRMMIJWz/WQ3QCOTIQJG2bGiyUjYMJ2sUSOXcLZmgXDPOVbKiGO6YUVsd7CFksBn5dF28jsRxIIK1fvnu4rr1b9zhXo8tXoTWlkRMcrqGoNRYKjDO4o8WeHr2m2V1FtUpZTMIYgjvAbqDD7ePyXkGCLoCyPiBdA6y+iDK079XfKhrHfP/mzvW1F9bQsGH+nbqn0DXZ6d47BC4uFzKIM6C13L077XcBdPwt5qD+mHO+oT+w9ffyvlPO+wR9s+JWor+yl4vuj1d25vMpCaSll9J9dMFkx1CqVMbre5mcGyWkYeesFFphgwapAL8tqHysDOmxaGuY6oGxKEs8SJ8uN518f0sduya9RJTAqpXou39Fse15kYDqOZEDVz4KwlDow80RS8H451DxoVYrU0lBKzc84GV+kw6DCl87okOi/FOo8LeHTxkRB8epL4A1DROrxR7FmwO56jXDJV8oLkdex8Blb3xyt9ubT6wJWWCDOYhP4JPmd66VUAJu7oelmqu7aDh3n8acjvyovlLTd6VQlzrFtkMbAzTJL1qUkWbPXsl/rpIuklzM924exDic0vfs1pGjgPEX1gQkLO15uhm0WGTPCpuWIRpC8vNe24jwWzrI=
-  file: "$TRAVIS_BUILD_DIR/target/topology-5.0.0.zip"
+  file: "$TRAVIS_BUILD_DIR/target/topology-0.0.0.zip"
   skip_cleanup: true
   on:
     repo: bahaaldine/topology
