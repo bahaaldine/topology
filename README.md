@@ -11,7 +11,7 @@ Topology does not support Kibana version lower than 5.x. The topology version yo
 ```sh
 #Kibana >= 5.x
 
-./bin/kibana-plugin install  https://github.com/elastic/catsize/releases/download/version_name/catsize-major.minor.patch.zip
+./bin/kibana-plugin install https://github.com/bahaaldine/topology/releases/download/major.minor.patch/topology-major.minor.patch.zip
 
 ```
 
