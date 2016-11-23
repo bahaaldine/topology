@@ -1,10 +1,10 @@
 {
   "name": "topology",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "description": "a cluster Topology explorer",
   "main": "index.js",
   "kibana": {
-    "version": "5.0.0"
+    "version": "5.0.1"
   },
   "scripts": {
     "lint": "eslint",
