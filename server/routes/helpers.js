@@ -34,12 +34,16 @@ function catSegments(server) {
 }
 
 function toMB(value) {
-	const parsedValue = parseInt(value.substring(0, value.length - 2));
-	switch ( value.slice(-2) ) {
-		case 'kb': return (parsedValue / 1024).toFixed(2) ;
-		case 'gb': return (parsedValue * 1024).toFixed(2) ;
-		case 'tb': return (parsedValue * 1024 * 1024).toFixed(2) ;
-		default: return parsedValue
+	if ( value ) {
+		const parsedValue = parseInt(value.substring(0, value.length - 2));
+		switch ( value.slice(-2) ) {
+			case 'kb': return (parsedValue / 1024).toFixed(2) ;
+			case 'gb': return (parsedValue * 1024).toFixed(2) ;
+			case 'tb': return (parsedValue * 1024 * 1024).toFixed(2) ;
+			default: return parsedValue
+		}
+	} else {
+		return 0;
 	}
 }
 
