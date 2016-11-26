@@ -28,8 +28,6 @@ topology:
       verify: boolean, whether or not the certificate should be verified
     username: topology
     password: topology
-    logQueries: false
-  loggingTag: '[catsize]'
 ```
 
 Topology does not support Kibana version lower than 5.x. The topology version you will use, should be the same than the Kibana version, you just need to adapt the following command:
