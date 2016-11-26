@@ -6,6 +6,32 @@
 
 ## Installation
 
+With the user and role created, add the following catsize settings to the kibana.yml file:
+
+*Minimal configuration*
+```yaml
+topology:
+  elasticsearch:
+    username: topology
+    password: topology
+```
+
+*Full-version*
+```yaml
+topology:
+  elasticsearch:
+    url: url_to_the_elasticsearch_cluser
+    ssl: 
+      cert: path_to_the_cert_file
+      key: path_to_the_key_file
+      ca: path_to_the_ca_file
+      verify: boolean, whether or not the certificate should be verified
+    username: topology
+    password: topology
+    logQueries: false
+  loggingTag: '[catsize]'
+```
+
 Topology does not support Kibana version lower than 5.x. The topology version you will use, should be the same than the Kibana version, you just need to adapt the following command:
 
 ```sh
