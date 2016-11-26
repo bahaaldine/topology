@@ -6,6 +6,45 @@
 
 ## Installation
 
+### Create Catsize user & role
+
+Catsize needs to create and manage its own index *catsize*, therefore needs a dedicated user with the relative permissions.
+With the Native Realm (X-Pack Security API) create the following role:
+
+```json
+PUT /_xpack/security/role/catsize_role
+{
+  "cluster": [
+    "manage_index_templates"
+  ],
+  "indices": [
+    {
+      "names": [
+        "catsize*"
+      ],
+      "privileges": [
+        "all"
+      ]
+    }
+  ]
+}
+```
+And then create a user mapped to the role:
+
+```json
+POST /_xpack/security/user/catsize
+{
+  "password" : "catsize", 
+  "roles" : [ "catsize_role" ], 
+  "full_name" : "Cat Size", 
+  "email" : "catsize@elastic.co", 
+  "enabled": true 
+}
+```
+Please note that you can choose whatever username and password you want.
+
+### Add Topology configuration to Kibana.yml
+
 With the user and role created, add the following topology settings to the kibana.yml file:
 
 *Minimal configuration*
@@ -29,6 +68,8 @@ topology:
     username: topology
     password: topology
 ```
+
+### Installing plugin
 
 Topology does not support Kibana version lower than 5.x. The topology version you will use, should be the same than the Kibana version, you just need to adapt the following command:
 
