@@ -6,6 +6,8 @@
 
 ## Installation
 
+If you don't have X-Pack security installed, you can jump to the plugin installation directly [here](https://github.com/bahaaldine/topology/blob/master/README.md#installing-plugin)
+
 ### Create Topology user & role
 
 Topology uses the `_cat` API therefore needs monitor priviledge at cluster level.
