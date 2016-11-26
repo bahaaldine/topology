@@ -6,38 +6,28 @@
 
 ## Installation
 
-### Create Catsize user & role
+### Create Topology user & role
 
-Catsize needs to create and manage its own index *catsize*, therefore needs a dedicated user with the relative permissions.
+Topology uses the `_cat` API therefore needs monitor priviledge at cluster level.
 With the Native Realm (X-Pack Security API) create the following role:
 
 ```json
-PUT /_xpack/security/role/catsize_role
+PUT /_xpack/security/role/topology_role
 {
   "cluster": [
-    "manage_index_templates"
-  ],
-  "indices": [
-    {
-      "names": [
-        "catsize*"
-      ],
-      "privileges": [
-        "all"
-      ]
-    }
+    "monitor"
   ]
 }
 ```
 And then create a user mapped to the role:
 
 ```json
-POST /_xpack/security/user/catsize
+POST /_xpack/security/user/topology
 {
-  "password" : "catsize", 
-  "roles" : [ "catsize_role" ], 
-  "full_name" : "Cat Size", 
-  "email" : "catsize@elastic.co", 
+  "password" : "topology", 
+  "roles" : [ "topology_role" ], 
+  "full_name" : "Topo logy", 
+  "email" : "topology@elastic.co", 
   "enabled": true 
 }
 ```
