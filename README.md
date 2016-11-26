@@ -6,7 +6,7 @@
 
 ## Installation
 
-With the user and role created, add the following catsize settings to the kibana.yml file:
+With the user and role created, add the following topology settings to the kibana.yml file:
 
 *Minimal configuration*
 ```yaml
