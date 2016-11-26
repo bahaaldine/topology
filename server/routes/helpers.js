@@ -13,21 +13,21 @@ const healthColors = {
 }
 
 function catIndices(server) {
-	const client = server.plugins.elasticsearch.client;
+	const client = server.plugins.topology.client;
 	return function() {
 		return client.cat.indices({format: 'json'});
 	} 
 }
 
 function catShards(server) {
-	const client = server.plugins.elasticsearch.client;
+	const client = server.plugins.topology.client;
 	return function() {
 		return client.cat.shards({format: 'json'});
 	} 
 }
 
 function catSegments(server) {
-	const client = server.plugins.elasticsearch.client;
+	const client = server.plugins.topology.client;
 	return function() {
 		return client.cat.segments({format: 'json'});
 	} 
@@ -80,7 +80,7 @@ function buildChartData(topology = {}) {
 }
 
 function getClusterTopology(server) {
-	const client = server.plugins.elasticsearch.client;
+	const client = server.plugins.topology.client;
 	let topology = { health: {}, indices : {} };
 	return function() {
 		function getShardTypeName(shardType) {

@@ -1,4 +1,6 @@
+import Promise from 'bluebird';
 import topologyRoutes from './server/routes/api';
+import publishElasticsearchClient from './server/lib/publish_elasticsearch_client';
 
 export default function (kibana) {
   return new kibana.Plugin({
@@ -22,13 +24,34 @@ export default function (kibana) {
     config(Joi) {
       return Joi.object({
         enabled: Joi.boolean().default(true),
+        elasticsearch: {
+          username: Joi.string(),
+          password: Joi.string(),
+          url: Joi.string(),
+          ssl: {
+            cert: Joi.string(),
+            key: Joi.string(),
+            ca: Joi.string(),
+            verify: Joi.boolean()
+          }
+        }
       }).default();
     },
-
     
     init(server, options) {
-      // Add server routes and initalize the plugin here
+      
+      var plugin = this;
       topologyRoutes(server);
+
+      plugin.status.yellow('Waiting for Topology');
+      server.plugins.elasticsearch.status.on('green', function () {
+        Promise.try(publishElasticsearchClient(server))
+          .then(function (arg) {
+            plugin.status.green('Ready.'); 
+          })
+          .catch(console.log.bind(console));
+      });
+      
     }    
 
   });
