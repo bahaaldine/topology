@@ -18,6 +18,16 @@ PUT /_xpack/security/role/topology_role
 {
   "cluster": [
     "monitor"
+  ],
+  "indices": [
+    {
+      "names": [
+        "*"
+      ],
+      "privileges": [
+        "monitor"
+      ]
+    }
   ]
 }
 ```
