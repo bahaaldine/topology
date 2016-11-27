@@ -3,16 +3,20 @@ import url from 'url';
 import { readFileSync } from 'fs';
 
 const readFile = file => readFileSync(file, 'utf8');
-const configPrefix = 'topology.elasticsearch';
+const configPrefix = 'topology';
 
 function getElasticsearchConfig(config, isRemoteKibana) {
-  const topologyConfig = config.get('topology.elasticsearch');
+  const topologyConfig = config.get(`${configPrefix}.elasticsearch`);
 
   /* if Topology requires a specific user to get cluster level information
    * then we grab the username and password from the topology configuration
    */
-  const authConfig = pick(config.get('topology.elasticsearch'), 'username', 'password');
-  const urlConfig = pick(config.get('elasticsearch'), 'url', 'ssl');
+  const authConfig = pick(config.get(`${configPrefix}.elasticsearch`), 'username', 'password');
+  
+  let urlConfig = pick(config.get('elasticsearch'), 'url', 'ssl');
+  if ( isRemoteKibana ) {
+    urlConfig = pick(config.get(`${configPrefix}.elasticsearch`), 'url', 'ssl');
+  }
 
   const esConfig = { ...urlConfig, ...authConfig };
 
@@ -46,7 +50,6 @@ function getElasticsearchURL(config, withAuthentification) {
       elasticsearchURL.auth = `${config.username}:${config.password}`;
     }
   }
-  
   return elasticsearchURL;
 }
 
@@ -62,12 +65,12 @@ function getConfigObjects(config, isRemoteKibana) {
 }
 
 export default function initTopologyClientConfiguration(config) {
-  const isRemoteKibana = Boolean(config.get(`${configPrefix}.url`));
+  const isRemoteKibana = Boolean(config.get(`${configPrefix}.elasticsearch.url`));
   const configObjects = getConfigObjects(config, isRemoteKibana);
 
   if (!isRemoteKibana) {
-    config.set(configPrefix, pick(configObjects.options, 'url', 'username', 'password'));
-    config.set(`${configPrefix}.ssl`, pick(configObjects.ssl, 'verify', 'cert', 'key', 'ca'));
+    config.set(`${configPrefix}.elasticsearch`, pick(configObjects.options, 'url', 'username', 'password'));
+    config.set(`${configPrefix}.elasticsearch.ssl`, pick(configObjects.ssl, 'verify', 'cert', 'key', 'ca'));
   }
 
   delete configObjects.options.ssl;

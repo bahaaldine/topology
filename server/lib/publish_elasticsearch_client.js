@@ -19,19 +19,18 @@ function createElasticsearchClient(options, uri, ssl) {
 function publishClient(server) {
   return function() {
     const config = server.config();
+    let client = server.plugins.elasticsearch.client;
 
     /* We only need to publish a dedicated Topology client if 
      * X-Pack security is installed
      */
     if ( Boolean(server.plugins.xpack_main) ) {
       const { options, authUri, noAuthUri, ssl } = initTopologyClientConfig(config);
-      const client = createElasticsearchClient(options, authUri, ssl);
+      client = createElasticsearchClient(options, authUri, ssl);
+    } 
 
-      server.on('close', bindKey(client, 'close'));
-      server.expose('client', client);
-    } else {
-      server.expose('client', server.plugins.elasticsearch.client);
-    }
+    server.on('close', bindKey(client, 'close'));
+    server.expose('client', client);
   }
 }
 
