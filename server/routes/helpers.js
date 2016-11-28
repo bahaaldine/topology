@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import Promise from 'bluebird';
 
 const healthColors = {
 	index: {
@@ -98,21 +99,30 @@ function getClusterTopology(server) {
 				});			
 				
 				// preparing a comma separated string of index name for shards and segments api
-				const indexNames = catIndicesResponse.map(index => {
-					return index.index;
-				}).join(',');
+				const shardPromises = _.chain(catIndicesResponse)
+					.map( (item) => item.index )
+					.chunk(20)
+					.map( (indices) => client.cat.shards( { format: 'json', index: indices.join(',') }) )
+					.value()
 
-				return client.cat.shards({format: 'json', index: indexNames}).then( (catShardsResponse) => {
+				const segmentPromises = _.chain(catIndicesResponse)
+					.map( (item) => item.index )
+					.chunk(20)
+					.map( (indices) => client.cat.segments({format: 'json', index: indices.join(',') }) )
+					.value()
+
+				
+				return Promise.all(shardPromises).then( (catShardsResponse) => {
 					// adding each shard to the relative index topology document
-					catShardsResponse.map(shard => {
+					[].concat(...catShardsResponse).map(shard => {
 						topology.indices[shard.index].shards[getShardTypeName(shard.prirep) + '-' + shard.shard] = { ...shard };
 						topology.indices[shard.index].shards[getShardTypeName(shard.prirep) + '-' + shard.shard].segments = {};
 					});
 
-					return client.cat.segments({format: 'json', index: indexNames}).then( (catSegmentsResponse) => {
+					return Promise.all(shardPromises).then( (catSegmentsResponse) => {
 						
 						// adding each segment to the relative shards
-						catSegmentsResponse.map(segment => {
+						[].concat(...catSegmentsResponse).map(segment => {
 							// segments exist only for assigned shards
 							if ( typeof topology.indices[segment.index].shards[getShardTypeName(segment.prirep) + '-' + segment.shard] != "undefined" ) {
 								topology.indices[segment.index].shards[getShardTypeName(segment.prirep) + '-' + segment.shard].segments['segment-' + segment.segment] = { ...segment };

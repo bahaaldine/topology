@@ -6,8 +6,6 @@ const readFile = file => readFileSync(file, 'utf8');
 const configPrefix = 'topology';
 
 function getElasticsearchConfig(config, isRemoteKibana) {
-  const topologyConfig = config.get(`${configPrefix}.elasticsearch`);
-
   /* if Topology requires a specific user to get cluster level information
    * then we grab the username and password from the topology configuration
    */
