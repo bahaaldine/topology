@@ -31,7 +31,7 @@ export default function (kibana) {
           ssl: {
             cert: Joi.string(),
             key: Joi.string(),
-            ca: Joi.string(),
+            ca: Joi.array().items(Joi.string()),
             verify: Joi.boolean()
           }
         }
