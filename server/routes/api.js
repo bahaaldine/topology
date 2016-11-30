@@ -1,11 +1,7 @@
-import cat_indices from './cat_indices'
-import cat_shards from './cat_shards'
-import cat_segments from './cat_segments'
-import get_cluster_topology from './get_cluster_topology'
+import get_cluster_health from './get_cluster_health'
+import get_data_heat_map from './get_data_heat_map'
 
 export default function (server) {
-	server = cat_indices(server);
-	server = cat_shards(server);
-	server = cat_segments(server);
-	server = get_cluster_topology(server);
+	server = get_cluster_health(server);
+	server = get_data_heat_map(server);
 };

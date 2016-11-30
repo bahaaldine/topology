@@ -13,25 +13,20 @@ const healthColors = {
 	}
 }
 
-function catIndices(server) {
-	const client = server.plugins.topology.client;
-	return function() {
-		return client.cat.indices({format: 'json'});
-	} 
+function catHealth(client) {
+	return client.cat.health({format: 'json'});
 }
 
-function catShards(server) {
-	const client = server.plugins.topology.client;
-	return function() {
-		return client.cat.shards({format: 'json'});
-	} 
+function catIndices(client, indexPattern) {
+	return client.cat.indices({format: 'json', index: indexPattern});
 }
 
-function catSegments(server) {
-	const client = server.plugins.topology.client;
-	return function() {
-		return client.cat.segments({format: 'json'});
-	} 
+function catShards(client, index) {
+	return client.cat.shards({format: 'json', index: index});
+}
+
+function catSegments(client, index) {
+	return client.cat.segments({format: 'json', index: index});
 }
 
 function toMB(value) {
@@ -48,7 +43,13 @@ function toMB(value) {
 	}
 }
 
-function buildChartData(topology = {}) {
+function getDataHeatMap(server, req) {
+	return function() {
+		return getIndicesTopology(server, req).then( (indexTopology) => buildTreeMap(indexTopology) );
+	}
+}
+
+function buildTreeMap(topology = {}) {
 	return {
 		cluster: topology.health,
 		treemap: _.map(topology.indices, (indexItem, indexName) => {
@@ -80,67 +81,72 @@ function buildChartData(topology = {}) {
 	}
 }
 
-function getClusterTopology(server) {
+function getClusterHealth(server, req) {
 	const client = server.plugins.topology.client;
-	let topology = { health: {}, indices : {} };
 	return function() {
-		function getShardTypeName(shardType) {
-			return shardType == 'p' ? 'primary' : 'replica'; 
-		}
+		return catHealth(client);
+	}
+}
 
-		return client.cat.health({format: 'json'}).then( (catHealthResponse) => {
-			topology.health = catHealthResponse[0];
+function getIndicesTopology(server, req) {
+	const client = server.plugins.topology.client;
+	const indexPattern = req.query.indexPattern;
 
-			return client.cat.indices({format: 'json'}).then( (catIndicesResponse) => {
-				// adding each index to the topology
-				catIndicesResponse.map(index => {
-					topology.indices[index.index] = { ...index };
-					topology.indices[index.index].shards = { };
-				});			
-				
-				// preparing a comma separated string of index name for shards and segments api
-				const shardPromises = _.chain(catIndicesResponse)
-					.map( (item) => item.index )
-					.chunk(20)
-					.map( (indices) => client.cat.shards( { format: 'json', index: indices.join(',') }) )
-					.value()
+	let topology = { health: {}, indices : {} };
 
-				const segmentPromises = _.chain(catIndicesResponse)
-					.map( (item) => item.index )
-					.chunk(20)
-					.map( (indices) => client.cat.segments({format: 'json', index: indices.join(',') }) )
-					.value()
+	return catHealth(client).then( (catHealthResponse) => {
+		topology.health = catHealthResponse[0];
 
-				
-				return Promise.all(shardPromises).then( (catShardsResponse) => {
-					// adding each shard to the relative index topology document
-					[].concat(...catShardsResponse).map(shard => {
-						topology.indices[shard.index].shards[getShardTypeName(shard.prirep) + '-' + shard.shard] = { ...shard };
-						topology.indices[shard.index].shards[getShardTypeName(shard.prirep) + '-' + shard.shard].segments = {};
+		return catIndices(client, indexPattern).then( (catIndicesResponse) => {
+			// adding each index to the topology
+			catIndicesResponse.map(index => {
+				topology.indices[index.index] = { ...index };
+				topology.indices[index.index].shards = { };
+			});			
+			
+			// preparing a comma separated string of index name for shards and segments apix@
+			const shardPromises = _.chain(catIndicesResponse)
+				.map( (item) => item.index )
+				.chunk(20)
+				.map( (indices) => catShards(client, indices.join(',')) )
+				.value()
+
+			const segmentPromises = _.chain(catIndicesResponse)
+				.map( (item) => item.index )
+				.chunk(20)
+				.map( (indices) => catSegments(client, indices.join(',')) )
+				.value()
+
+			
+			return Promise.all(shardPromises).then( (catShardsResponse) => {
+				function getShardTypeName(shardType) {
+					return shardType == 'p' ? 'primary' : 'replica'; 
+				}
+
+				// adding each shard to the relative index topology document
+				[].concat(...catShardsResponse).map(shard => {
+					topology.indices[shard.index].shards[getShardTypeName(shard.prirep) + '-' + shard.shard] = { ...shard };
+					topology.indices[shard.index].shards[getShardTypeName(shard.prirep) + '-' + shard.shard].segments = {};
+				});
+
+				return Promise.all(shardPromises).then( (catSegmentsResponse) => {
+					
+					// adding each segment to the relative shards
+					[].concat(...catSegmentsResponse).map(segment => {
+						// segments exist only for assigned shards
+						if ( typeof topology.indices[segment.index].shards[getShardTypeName(segment.prirep) + '-' + segment.shard] != "undefined" ) {
+							topology.indices[segment.index].shards[getShardTypeName(segment.prirep) + '-' + segment.shard].segments['segment-' + segment.segment] = { ...segment };
+						}
 					});
 
-					return Promise.all(shardPromises).then( (catSegmentsResponse) => {
-						
-						// adding each segment to the relative shards
-						[].concat(...catSegmentsResponse).map(segment => {
-							// segments exist only for assigned shards
-							if ( typeof topology.indices[segment.index].shards[getShardTypeName(segment.prirep) + '-' + segment.shard] != "undefined" ) {
-								topology.indices[segment.index].shards[getShardTypeName(segment.prirep) + '-' + segment.shard].segments['segment-' + segment.segment] = { ...segment };
-							}
-						});
-
-						return topology;
-					});
+					return topology;
 				});
 			});
 		});
-	};
+	});
 }
 
 export {
-	catIndices,
-	catShards,
-	catSegments,
-	getClusterTopology,
-	buildChartData
+	getClusterHealth,
+	getDataHeatMap
 };
