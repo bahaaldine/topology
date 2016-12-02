@@ -130,10 +130,8 @@ function getIndicesTopology(server, req) {
 				});
 
 				return Promise.all(segmentPromises).then( (catSegmentsResponse) => {
-					console.log(catSegmentsResponse);
 					// adding each segment to the relative shards
 					[].concat(...catSegmentsResponse).map(segment => {
-//						console.log(segment)
 						// segments exist only for assigned shards
 						if ( typeof topology.indices[segment.index].shards[getShardTypeName(segment.prirep) + '-' + segment.shard] != "undefined" ) {
 							topology.indices[segment.index].shards[getShardTypeName(segment.prirep) + '-' + segment.shard].segments['segment-' + segment.segment] = { ...segment };
