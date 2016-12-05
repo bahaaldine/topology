@@ -1,4 +1,9 @@
-<div class="topology-container" flex layout="row" layout-align="center center">
-	<h1>{{topology.description.cluster}}</h1>
+<div class="topology-container">
+	<div class="title" flex="80" layout="row" layout-align="center center">
+		<h1>{{topology.description.cluster}} / </h1>
+		<md-input-container class="md-block">
+		  <input ng-model="indexPattern">
+		</md-input-container>
+	</div>
 	<div cluster-topology flex style="width: 100%; min-height: 250px; height: 650px" flex class="cluster-topology"></div>
 </div>

@@ -12,8 +12,8 @@ export default function (server) {
       .then(function(topology) {
         reply(topology);
       })
-      .catch(function(err){
-        reply(Boom.badRequest(err.name + ': ' + err.message));
+      .catch(function( err ) {
+        reply({});
       });
     }
 	});

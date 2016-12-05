@@ -2,7 +2,7 @@ import uiModules from 'ui/modules';
 import _ from 'lodash';
 
 uiModules
-.get('app/topology', [])
+.get('app/topology', ['ngMaterial'])
 .controller('indexController', [ '$scope', function ($scope) {
 
 }])
@@ -11,6 +11,7 @@ uiModules
     link: function($scope, $element, attrs) {
     	
 			$scope.topology = new DataHeatMap($element[0]);
+      $scope.indexPattern = '*';
 
 			const resizeChart = function() {
 				if($scope.topology.getChart() != null 
@@ -20,15 +21,15 @@ uiModules
           	height: angular.element('.topology-container')[0].offsetHeight - 100
           });
         }
-
-				// manuall $digest required as resize event
-				// is outside of angular
 				$scope.$digest();
      	}
 
 			angular.element($window).bind('resize', resizeChart);
-	
 			$timeout( function() { resizeChart(); } );
+
+      $scope.$watch('indexPattern', (indexPattern) => {
+        $scope.topology.setIndexPattern(indexPattern) 
+      });
     }
   }
 }]);

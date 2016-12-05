@@ -30,6 +30,10 @@ uiModules
       super(container);
       getDataHeatMap($http, chrome).then( (option) => this.chart.setOption( option ) );
     }
+
+    setIndexPattern(indexPattern) {
+      getDataHeatMap($http, chrome, indexPattern).then( (option) => this.chart.setOption( option ) );
+    }
   }
   return DataHeatMap;
 

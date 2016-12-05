@@ -13,10 +13,13 @@ function initChart(container) {
   return echarts.init(container);
 }
 
-function getDataHeatMap($http, chrome) {
+function getDataHeatMap($http, chrome, indexPattern) {
   const formatUtil = echarts.format;
-  
-  return $http.get(chrome.addBasePath('/topology/data_heat_map'))
+  let url = chrome.addBasePath('/topology/data_heat_map'); 
+  if ( typeof indexPattern != "undefined" ) {
+    url += '?indexPattern='+indexPattern;
+  }
+  return $http.get(url)
   .then( response => { 
     return {
       tooltip: {

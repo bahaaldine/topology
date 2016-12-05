@@ -26,6 +26,10 @@
     "eslint-plugin-mocha": "1.1.0"
   },
   "dependencies": {
+    "angular": "^1.4.7",
+    "angular-animate": "^1.4.7",
+    "angular-aria": "^1.4.7",
+    "angular-material": "^1.1.1",
     "boom": "^4.2.0",
     "echarts": "^3.3.1",
     "elasticsearch": "^12.1.0"
