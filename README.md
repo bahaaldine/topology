@@ -91,3 +91,4 @@ This plugin is supported by:
 ## Features:
 
 * Explore indices / shards / segments topology
+* Filter indices
