@@ -1,0 +1,17 @@
+<md-bottom-sheet class="md-grid index-heat-map-controls" layout="column">
+  <div layout="row" layout-align="center center" ng-cloak>
+    <h4><code>{{selectedIndex}}</code></h4>
+  </div>
+  <div ng-cloak>
+    <md-list flex layout="row" layout-align="center center">
+      <md-list-item flex="10" ng-repeat="item in items">
+        <div>
+          <md-button class="md-grid-item-content" ng-click="listItemClick($index)">
+            <i class="mdi white center md-36 mdi-{{item.icon}}"></i>
+            <div class="md-grid-text">{{ item.name }} </div>
+          </md-button>
+        </div>
+      </md-list-item>
+    </md-list>
+  </div>
+</md-bottom-sheet>

@@ -1,9 +1,10 @@
-<div class="topology-container">
+<div class="topology-container" layout="column" layout-align="center center">
 	<div class="title" flex="80" layout="row" layout-align="center center">
 		<h1>{{topology.description.cluster}} / </h1>
 		<md-input-container class="md-block">
 		  <input autofocus ng-model="indexPattern">
 		</md-input-container>
+		<!--md-button ng-if="selectedIndex" class="md-primary" ng-click="showIndexControls()">Controls</md-button-->
 	</div>
-	<div cluster-topology flex style="width: 100%; min-height: 250px; height: 650px" flex class="cluster-topology"></div>
+	<div index-topology flex style="width: 100%; min-height: 250px; height: 650px" flex></div>
 </div>

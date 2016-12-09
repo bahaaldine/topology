@@ -13,7 +13,7 @@ function initChart(container) {
   return echarts.init(container);
 }
 
-function getDataHeatMap($http, chrome, indexPattern) {
+function getDataHeatMap($scope, $http, chrome, indexPattern) {
   const formatUtil = echarts.format;
   let url = chrome.addBasePath('/topology/data_heat_map'); 
   if ( typeof indexPattern != "undefined" ) {
@@ -48,6 +48,9 @@ function getDataHeatMap($http, chrome, indexPattern) {
             '<div>Docs deleted: ' + formatUtil.addCommas(docsDeleted) + '</div>'];
           if ( typeof info.data.segments != 'undefined' ) {
             docsStats = ['<div>Docs count: ' + formatUtil.addCommas(info.data['docs']) + '</div>']
+            $scope.$apply(function () {
+              $scope.path = formatUtil.encodeHTML(treePath.join('/'));
+            });
           } 
 
           return [
@@ -57,14 +60,15 @@ function getDataHeatMap($http, chrome, indexPattern) {
         }
       },
       series: [{
-        name: 'Index topology',
+        name: 'path:',
         type: 'treemap',
         data: response.data.treemap,
         visibleMin: null,
         leafDepth: 1,
-        zoomToNodeRatio: 0.02*0.02,
+        nodeClick: 'link',
         breadcrumb: {
-          top: 1,
+          left: 'center',
+          top: 'top',
           itemStyle: {
             normal: {
               color: '#607D8B',

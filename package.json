@@ -1,10 +1,10 @@
 {
   "name": "topology",
-  "version": "5.0.2",
+  "version": "5.1.1",
   "description": "a cluster Topology explorer",
   "main": "index.js",
   "kibana": {
-    "version": "5.0.2"
+    "version": "5.1.1"
   },
   "scripts": {
     "lint": "eslint",
@@ -32,6 +32,7 @@
     "angular-material": "^1.1.1",
     "boom": "^4.2.0",
     "echarts": "^3.3.1",
-    "elasticsearch": "^12.1.0"
+    "elasticsearch": "^12.1.0",
+    "mdi": "^1.7.22"
   }
 }

@@ -1,3 +1,31 @@
+@import "../../node_modules/mdi/css/materialdesignicons.min.css";
+
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../../node_modules/mdi/fonts/materialdesignicons-webfont.eot'),
+       url('../../node_modules/mdi/fonts/materialdesignicons-webfont.woff2') format('woff2'),
+       url('../../node_modules/mdi/fonts/materialdesignicons-webfont.woff') format('woff'),
+       url('../../node_modules/mdi/fonts/materialdesignicons-webfont.ttf') format('truetype');
+}
+
+i.mdi {
+  margin: 0px 5px 0px 0px;
+}
+i.left.mdi {
+  margin: 0px 0px 0px 5px;
+}
+i.center.mdi {
+  margin: 0px 0px 0px 0px;
+}
+.mdi.md-18 { font-size: 18px; }
+.mdi.md-24 { font-size: 24px; }
+.mdi.md-25 { font-size: 25px; }
+.mdi.md-36 { font-size: 36px; }
+.mdi.md-48 { font-size: 48px; }
+.mdi.white { color: #fff; }
+
 .application {
 	background-color: #2f99c1;
 }
@@ -34,6 +62,22 @@
 	display: none;
 }
 
+.topology-container > .title > button { 
+	background: #3caed2;
+	color: white;
+	text-transform: capitalize;
+}
+
 .topology-container > div > div > canvas {
 	background-color: #2f99c1;	
+}
+
+.index-heat-map-controls {
+	background: #3caed2;
+	color: white;
+	border: none;
+}
+
+.index-heat-map-controls > div > md-list > md-list-item > div > button > div {
+	font-weight: 700 !important;
 }

@@ -7,12 +7,12 @@ uiModules
 .factory('Topology', ['$http', 'chrome', function ($http, chrome) {
   class Topology {
 
-    constructor(container) {
+    constructor(container, scope) {
       $http.get(chrome.addBasePath('/topology/cluster_health'))
       .then( (health) => {
         this.description = health.data;
       }.bind(this));
-
+      this.scope = scope;
       this.chart = initChart(container);
     }
 
@@ -23,16 +23,18 @@ uiModules
   return Topology;
 
 }])
-.factory('DataHeatMap', ['Topology', '$http', 'chrome',function (Topology, $http, chrome) {
+.factory('DataHeatMap', ['Topology', '$http', 'chrome'
+  ,function (Topology, $http, chrome) {
   class DataHeatMap extends Topology {
 
-    constructor(container) {
-      super(container);
-      getDataHeatMap($http, chrome).then( (option) => this.chart.setOption( option ) );
+    constructor(container, scope) {
+      super(container, scope);
+      getDataHeatMap(scope, $http, chrome).then( (option) => this.chart.setOption( option ) );
+      console.info(this.chart)
     }
 
     setIndexPattern(indexPattern) {
-      getDataHeatMap($http, chrome, indexPattern).then( (option) => this.chart.setOption( option ) );
+      getDataHeatMap(this.scope, $http, chrome, indexPattern).then( (option) => this.chart.setOption( option ) );
     }
   }
   return DataHeatMap;
